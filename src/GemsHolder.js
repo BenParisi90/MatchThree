@@ -12,8 +12,8 @@ var gridSize = 544,
 exports = Class(ui.View, function (supr) {
 	this.init = function (opts) {
 		opts = merge(opts, {
-			x: 0,
-			y: 0,
+			x: 19,
+			y: 302,
 			width: gridSize,
 			height: gridSize
 		});
@@ -28,9 +28,8 @@ exports = Class(ui.View, function (supr) {
 	 */
 	this.build = function () {
 
-		var x_offset = 5;
+		var x_offset = 19;
 		var y_offset = 160;
-		var y_pad = 25;
 
 		/*this.style.width = 320;
 		this.style.height = 480;*/
@@ -44,8 +43,8 @@ exports = Class(ui.View, function (supr) {
 			for (var col = 0; col < gemCols; col++) {
 
 					var gem = new Gem();
-					gem.style.x = x_offset + col * gem.style.width;
-					gem.style.y = y_offset + row * (gem.style.height + y_pad);
+					gem.style.x = col * gem.style.width;
+					gem.style.y = row * (gem.style.height);
 					this.addSubview(gem);
 					this._gems[row].push(gem);
 
