@@ -18,7 +18,7 @@ exports = Class(ui.ImageView, function (supr) {
 		opts = merge(opts, {
 			x: 0,
 			y: 0,
-			image: "resources/images/title_screen.png"
+			image: "resources/images/ui/background.png"
 		});
 
 		supr(this, 'init', [opts]);
@@ -27,6 +27,8 @@ exports = Class(ui.ImageView, function (supr) {
 	};
 
 	this.build = function() {
+
+		//var gemsHolder = new GemsHolder();
 		/* Since the start button is a part the background image,
 		 * we just need to create and position an overlay view that
 		 * will register input events and act as button.

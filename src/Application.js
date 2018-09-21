@@ -23,18 +23,17 @@ exports = Class(GC.Application, function () {
 		this.view.style.backgroundColor = '#008a42';
 
 
-		// Create a stackview of size 320x480, then scale it to fit horizontally
-		// Add a new StackView to the root of the scene graph
+		/*Our UI background image is 576 x 1024 we will design to this aspect ratio*/
 		var rootView = new StackView({
 			superview: this,
 			// x: device.width / 2 - 160,
 			// y: device.height / 2 - 240,
 			x: 0,
 			y: 0,
-			width: 320,
-			height: 480,
+			width: 576,
+			height: 1024,
 			clip: true,
-			scale: device.width / 320
+			scale: device.width / 576
 		});
 
 		rootView.push(gamescreen);
