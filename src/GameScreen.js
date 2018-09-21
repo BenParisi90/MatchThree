@@ -8,6 +8,7 @@
 
 import ui.View;
 import ui.ImageView;
+import src.GemsHolder as GemsHolder;
 
 /* The title screen is added to the scene graph when it becomes
  * a child of the main application. When this class is instantiated,
@@ -27,7 +28,8 @@ exports = Class(ui.ImageView, function (supr) {
 	};
 
 	this.build = function() {
-
+		var gemsHolder = new GemsHolder();
+		this.addSubview(gemsHolder);
 		//var gemsHolder = new GemsHolder();
 		/* Since the start button is a part the background image,
 		 * we just need to create and position an overlay view that
