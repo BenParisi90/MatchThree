@@ -6,7 +6,6 @@
 import device;
 import ui.StackView as StackView;
 //user imports
-import src.TitleScreen as TitleScreen;
 import src.GameScreen as GameScreen;
 import src.soundcontroller as soundcontroller;
 
@@ -19,8 +18,7 @@ exports = Class(GC.Application, function () {
 	 * place, but before the resources have been loaded.
 	 */
 	this.initUI = function () {
-		var titlescreen = new TitleScreen(),
-				gamescreen = new GameScreen();
+		var gamescreen = new GameScreen();
 
 		this.view.style.backgroundColor = '#008a42';
 
@@ -39,28 +37,28 @@ exports = Class(GC.Application, function () {
 			scale: device.width / 320
 		});
 
-		rootView.push(titlescreen);
+		rootView.push(gamescreen);
 
-		var sound = soundcontroller.getSound();
+		//var sound = soundcontroller.getSound();
 
 		/* Listen for an event dispatched by the title screen when
 		 * the start button has been pressed. Hide the title screen,
 		 * show the game screen, then dispatch a custom event to the
 		 * game screen to start the game.
 		 */
-		titlescreen.on('titlescreen:start', function () {
+		/*titlescreen.on('titlescreen:start', function () {
 			sound.play('levelmusic');
 			rootView.push(gamescreen);
 			gamescreen.emit('app:start');
-		});
+		});*/
 
 		/* When the game screen has signalled that the game is over,
 		 * show the title screen so that the user may play the game again.
 		 */
-		gamescreen.on('gamescreen:end', function () {
+		/*gamescreen.on('gamescreen:end', function () {
 			sound.stop('levelmusic');
 			rootView.pop();
-		});
+		});*/
 	};
 
 	/* Executed after the asset resources have been loaded.
