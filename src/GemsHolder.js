@@ -7,7 +7,8 @@ import src.Gem as Gem;
 var gridSize = 544,
 	gemSize = 68,
 	gemRows = 8,
-	gemCols = 8
+	gemCols = 8,
+	numOfGemTypes = 5;
 
 exports = Class(ui.View, function (supr) {
 	this.init = function (opts) {
@@ -42,7 +43,8 @@ exports = Class(ui.View, function (supr) {
 
 			for (var col = 0; col < gemCols; col++) {
 
-					var gem = new Gem();
+					var gemType = Math.floor(Math.random() * numOfGemTypes);
+					var gem = new Gem({gemType: gemType});
 					gem.style.x = col * gem.style.width;
 					gem.style.y = row * (gem.style.height);
 					this.addSubview(gem);

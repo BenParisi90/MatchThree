@@ -11,9 +11,7 @@ import src.soundcontroller as soundcontroller;
 		mole_up = 5,
 		mole_down = 35;*/
 var gemPathPrefix = "resources/images/gems/gem_0",
-	numOfGemTypes = 5,
-	gemSize = 68,
-	gemType = 0;
+	gemSize = 68;
 
 
 exports = Class(ui.View, function (supr) {
@@ -27,6 +25,7 @@ exports = Class(ui.View, function (supr) {
 		supr(this, 'init', [opts]);
 
 		//this.activeMole = false;
+		this.gemType = opts.gemType;
 
 		this.activeInput = false;
 
@@ -101,8 +100,8 @@ exports = Class(ui.View, function (supr) {
 	 */
 	this.build = function () {
 
-		this.gemType = Math.floor(Math.random() * numOfGemTypes);
-		var gemName = this.gemType + 1
+		//this.gemType = Math.floor(Math.random() * 5);
+		var gemName = this.gemType + 1;
 		this.gemImg = new Image({url: gemPathPrefix + gemName + ".png", sourceW: gemSize, sourceH: gemSize});
 
 		var gemView = new ui.ImageView({
