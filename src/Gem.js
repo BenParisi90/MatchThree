@@ -4,24 +4,30 @@ import ui.ImageView;
 import ui.resource.Image as Image;
 import src.soundcontroller as soundcontroller;
 
-var mole_normal_img = new Image({url: "resources/images/mole_normal.png", sourceW: 46, sourceH: 54}),
+/*var mole_normal_img = new Image({url: "resources/images/mole_normal.png", sourceW: 46, sourceH: 54}),
 		mole_hit_img = new Image({url: "resources/images/mole_hit.png", sourceW: 46, sourceH: 54}),
 		hole_back_img = new Image({url: "resources/images/hole_back.png", sourceW: 103, sourceH: 28}),
 		hole_front_img = new Image({url: "resources/images/hole_front.png", sourceW: 103, sourceH: 28}),
 		mole_up = 5,
-		mole_down = 35;
+		mole_down = 35;*/
+var gemPathPrefix = "resources/images/gems/gem_0",
+	numOfGemTypes = 5,
+	gemSize = 68,
+	gemType = 0;
+
 
 exports = Class(ui.View, function (supr) {
 
 	this.init = function (opts) {
 		opts = merge(opts, {
-			width:	hole_back_img.getWidth(),
-			height: hole_back_img.getHeight() + mole_normal_img.getHeight()
+			width:	gemSize,
+			height: gemSize
 		});
 
 		supr(this, 'init', [opts]);
 
-		this.activeMole = false;
+		//this.activeMole = false;
+
 		this.activeInput = false;
 
 		this.build();
@@ -94,25 +100,30 @@ exports = Class(ui.View, function (supr) {
 	 * Layout
 	 */
 	this.build = function () {
-		var hole_back = new ui.ImageView({
+
+		this.gemType = Math.floor(Math.random() * numOfGemTypes);
+		var gemName = this.gemType + 1
+		this.gemImg = new Image({url: gemPathPrefix + gemName + ".png", sourceW: gemSize, sourceH: gemSize});
+
+		var gemView = new ui.ImageView({
 			superview: this,
-			image: hole_back_img,
+			image: this.gemImg,
 			x: 0,
-			y: 25,
-			width: hole_back_img.getWidth(),
-			height: hole_back_img.getHeight()
+			y: 0,
+			width: this.gemImg.getWidth(),
+			height: this.gemImg.getHeight()
 		});
 
 		this._inputview = new ui.View({
 			superview: this,
 			clip: true,
-			x: hole_back_img.getWidth()/2 - mole_normal_img.getWidth()/2,
+			x: this.gemImg.getWidth()/2 - this.gemImg.getWidth()/2,
 			y: 0,
-			width: mole_normal_img.getWidth(),
+			width: this.gemImg.getWidth(),
 			height: 40
 		});
 
-		this._moleview = new ui.ImageView({
+		/*this._moleview = new ui.ImageView({
 			superview: this._inputview,
 			image: mole_normal_img,
 			x: 0,
@@ -129,21 +140,21 @@ exports = Class(ui.View, function (supr) {
 			y: 25,
 			width: hole_front_img.getWidth(),
 			height: hole_front_img.getHeight()
-		});
+		});*/
 
 		/* Create an animator object for mole.
 		 */
-		this._animator = animate(this._moleview);
+		/*this._animator = animate(this._moleview);
 		this._interval = null;
 
-		var sound = soundcontroller.getSound();
+		var sound = soundcontroller.getSound();*/
 
-		this._inputview.on('InputSelect', bind(this, function () {
+		/*this._inputview.on('InputSelect', bind(this, function () {
 			if (this.activeInput) {
 				sound.play('whack');
 				this.emit('molehill:hit');
 				this.hitMole();
 			}
-		}));
+		}));*/
 	};
 });
