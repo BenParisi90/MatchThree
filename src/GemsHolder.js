@@ -126,7 +126,7 @@ exports = Class(ui.View, function (supr) {
 	};
 
 	this.swapGems = function(gem1, gem2){
-		this.inputState = "noSelection";
+		this.inputState = "waitingForSwap";
 		this.activateAllGems(false);
 		gem1.resetGem();
 		gem2.resetGem();
@@ -143,8 +143,9 @@ exports = Class(ui.View, function (supr) {
 	};
 
 	this.swapComplete = function(){
-		this.activateAllGems(true);
-		this.deleteMatches();
+		if(this.inputState == "waitingForSwap"){
+			this.deleteMatches();
+		}
 	};
 
 	this.activateAllGems = function(toggleOn){
@@ -154,7 +155,8 @@ exports = Class(ui.View, function (supr) {
 	};
 
 	this.deleteMatches = function(){
-
+		var colsToDrop = [0,0,0,0,0,0,0,0];
+		var hasDrops = false;
 		for (var row = 0; row < gemRows; row++) 
 		{
 			for (var col = 0; col < gemCols; col++) 
@@ -165,7 +167,8 @@ exports = Class(ui.View, function (supr) {
 					for(var i = col; i > col - 3; i --)
 					{
 						this.removeSubview(this.gemsGrid[row][i]);
-						//this.gemsGrid[row][col] = null;
+						colsToDrop[i] += 1;
+						hasDrops = true;
 					}
 				}
 				if(this.gemCausesColMatch(col, row, targetGem.gemType))
@@ -173,10 +176,23 @@ exports = Class(ui.View, function (supr) {
 					for(var i = row; i > row - 3; i --)
 					{
 						this.removeSubview(this.gemsGrid[i][col]);
-						//this.gemsGrid[row][col] = null;
+						colsToDrop[col] += 1;
+						hasDrops = true;
 					}
 				}
 			}
 		}
+		if(hasDrops){
+			this.dropCols(colsToDrop);
+			this.inputState = "droppingCols";
+		}else{
+			this.inputState = "noSelection";
+			this.activateAllGems(true);
+		}
+		
+	};
+
+	this.dropCols = function(colsToDrop){
+		console.log(colsToDrop);
 	}
 });
