@@ -36,6 +36,7 @@ exports = Class(ui.View, function (supr) {
 		this.style.height = 480;*/
 
 		this._gems = [];
+		this.inputState = "noSelection";
 
 		for (var row = 0; row < gemRows; row++) {
 			//add a new row of gems
@@ -48,7 +49,7 @@ exports = Class(ui.View, function (supr) {
 					{
 						gemType = this.randomGemType();
 					}
-					var gem = new Gem({gemType: gemType});
+					var gem = new Gem({gemType: gemType, gemHolder:this, xPos:col, yPos:row});
 					gem.style.x = col * gem.style.width;
 					gem.style.y = row * (gem.style.height);
 					this.addSubview(gem);
@@ -96,4 +97,11 @@ exports = Class(ui.View, function (supr) {
 		}
 		return false;
 	};
+
+	this.selectGem = function(gem){
+		console.log("selected gem");
+		this.removeSubview(gem);
+		this.addSubview(gem);
+		this.inputState = "gemSelected";
+	}
 });

@@ -26,85 +26,33 @@ exports = Class(ui.View, function (supr) {
 
 		//this.activeMole = false;
 		this.gemType = opts.gemType;
+		this.gemHolder = opts.gemHolder;
+		this.xPos = opts.xPos;
+		this.yPos = opts.yPos;
 
-		this.activeInput = false;
+		this.activeInput = true;
 
 		this.build();
 	};
 
-	/* Set the mole as active and animate it up.
-	 */
-	this.showMole = function () {
-		if (this.activeMole === false) {
-			this.activeMole = true;
-			this.activeInput = true;
-
-			this._animator.now({y: mole_up}, 500, animate.easeIn)
-				.wait(1000).then(bind(this, function () {
-					this.activeInput = false;
-				})).then({y: mole_down}, 200, animate.easeOut)
-				.then(bind(this, function () {
-					this.activeMole = false;
-				}));
-		}
-	};
-
 	/* Set mole as inactive and animate it down.
 	 */
-	this.hitMole = function () {
-		if (this.activeMole && this.activeInput) {
-			this.activeInput = false;
-
-			this._animator.clear()
-				.now((function () {
-					this._moleview.setImage(mole_hit_img);
-				}).bind(this))
-				.then({y: mole_down}, 1500)
-				.then(bind(this, function () {
-					this._moleview.setImage(mole_normal_img);
-					this.activeMole = false;
-					this.activeInput = false;
-				}));
-		}
-	};
-
-	/* Ending animation, pop up and "laugh"
-	 */
-	this.endAnimation = function () {
-		this.activeInput = false;
-		this._animator.then({y: mole_up}, 2000)
+	this.selectGem = function () {
+		this._animator.clear()
+			.now({scale: 1.5, x: -20, y:-20}, 1500)
 			.then(bind(this, function () {
-				this._interval = setInterval(bind(this, function () {
-					if (this._moleview.getImage() === mole_normal_img) {
-						this._moleview.setImage(mole_hit_img);
-					} else {
-						this._moleview.setImage(mole_normal_img);
-					}
-				}), 100);
+				console.log("anim complete");
 			}));
-	};
-
-	/* Rest the molehill properties for the next game.
-	 */
-	this.resetMole = function () {
-		clearInterval(this._interval);
-		this._animator.clear();
-		this._moleview.style.y = mole_down;
-		this._moleview.setImage(mole_normal_img);
-		this.activeMole = false;
-		this.activeInput = false;
 	};
 
 	/*
 	 * Layout
 	 */
 	this.build = function () {
-
-		//this.gemType = Math.floor(Math.random() * 5);
 		var gemName = this.gemType + 1;
 		this.gemImg = new Image({url: gemPathPrefix + gemName + ".png", sourceW: gemSize, sourceH: gemSize});
 
-		var gemView = new ui.ImageView({
+		this.gemView = new ui.ImageView({
 			superview: this,
 			image: this.gemImg,
 			x: 0,
@@ -116,44 +64,26 @@ exports = Class(ui.View, function (supr) {
 		this._inputview = new ui.View({
 			superview: this,
 			clip: true,
-			x: this.gemImg.getWidth()/2 - this.gemImg.getWidth()/2,
+			x: 0,
 			y: 0,
 			width: this.gemImg.getWidth(),
-			height: 40
+			height: this.gemImg.getHeight()
 		});
 
-		/*this._moleview = new ui.ImageView({
-			superview: this._inputview,
-			image: mole_normal_img,
-			x: 0,
-			y: mole_down,
-			width: mole_normal_img.getWidth(),
-			height: mole_normal_img.getHeight()
-		});
+		/* Create an animator object for gem. 
+		*/
+		this._animator = animate(this.gemView);
+		//this._interval = null;
 
-		var hole_front = new ui.ImageView({
-			superview: this,
-			canHandleEvents: false,
-			image: hole_front_img,
-			x: 0,
-			y: 25,
-			width: hole_front_img.getWidth(),
-			height: hole_front_img.getHeight()
-		});*/
+		//var sound = soundcontroller.getSound();
 
-		/* Create an animator object for mole.
-		 */
-		/*this._animator = animate(this._moleview);
-		this._interval = null;
-
-		var sound = soundcontroller.getSound();*/
-
-		/*this._inputview.on('InputSelect', bind(this, function () {
+		this._inputview.on('InputSelect', bind(this, function () {
 			if (this.activeInput) {
-				sound.play('whack');
-				this.emit('molehill:hit');
-				this.hitMole();
+				if(this.gemHolder.inputState == "noSelection"){
+					this.gemHolder.selectGem(this);
+					this.selectGem();
+				}
 			}
-		}));*/
+		}));
 	};
 });
