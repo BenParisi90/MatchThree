@@ -29,22 +29,29 @@ exports = Class(ui.View, function (supr) {
 		this.gemHolder = opts.gemHolder;
 		this.xPos = opts.xPos;
 		this.yPos = opts.yPos;
-
 		this.activeInput = true;
 
 		this.build();
 	};
 
+	this.recordGemLocation = function(){
+		this.xLoc = this.style.x;
+		this.yLoc = this.style.y;
+	}
+
 	this.resetGem = function(){
 		this._animator.clear();
+		this.style.x = this.xLoc;
+		this.style.y = this.yLoc;
+		this.style.scale = 1;
 		this.gemView.style.scale = 1;
 	}
 	/* Set mole as inactive and animate it down.
 	 */
 	this.selectGem = function () {
 		this._animator.clear()
-			.now({scale: 1.15, x: -5, y:-5}, 400)
-			.then({scale: 1, x: 0, y:0}, 400)
+			.now({scale: 1.15, x: this.style.x-5, y: this.style.y-5}, 400)
+			.then({scale: 1, x: this.style.x, y:this.style.y}, 400)
 			.then(this.selectGem.bind(this));
 	};
 
@@ -52,8 +59,9 @@ exports = Class(ui.View, function (supr) {
 		xDiff = targetGem.style.x - this.style.x;
 		yDiff = targetGem.style.y - this.style.y;
 		this._animator.clear()
-			.now({x: xDiff, y: yDiff}, 500)
+			.now({x:this.style.x+xDiff, y:this.style.y+yDiff}, 500)
 			.then(bind(this, function () {
+				this.recordGemLocation();
 				this.gemHolder.swapComplete();
 			}));
 	};
@@ -85,7 +93,7 @@ exports = Class(ui.View, function (supr) {
 
 		/* Create an animator object for gem. 
 		*/
-		this._animator = animate(this.gemView);
+		this._animator = animate(this);
 		//this._interval = null;
 
 		//var sound = soundcontroller.getSound();

@@ -55,6 +55,7 @@ exports = Class(ui.View, function (supr) {
 					var gem = new Gem({gemType: gemType, gemHolder:this, xPos:col, yPos:row});
 					gem.style.x = col * gem.style.width;
 					gem.style.y = row * (gem.style.height);
+					gem.recordGemLocation();
 					this.addSubview(gem);
 					this.gemsGrid[row].push(gem);
 					this.gemsList.push(gem);
@@ -109,7 +110,6 @@ exports = Class(ui.View, function (supr) {
 	}
 
 	this.selectGem = function(gem){
-		//console.log("selected gem");
 		this.inputState = "gemSelected";
 		//move the selected gem to the top of others
 		this.removeSubview(gem);
@@ -128,6 +128,7 @@ exports = Class(ui.View, function (supr) {
 	this.swapGems = function(gem1, gem2){
 		this.inputState = "waitingForSwap";
 		this.activateAllGems(false);
+		this.selectedGem = null;
 		gem1.resetGem();
 		gem2.resetGem();
 		//swap the gems place in both the model and visually
@@ -135,11 +136,12 @@ exports = Class(ui.View, function (supr) {
 		this.gemsGrid[gem2.yPos][gem2.xPos] = gem1;
 		gem1.animateToGemPosition(gem2);
 		gem2.animateToGemPosition(gem1);
-		var tempGem = gem1;
+		var tempGemXPos = gem1.xPos;
+		var tempGemYPos = gem1.yPos;
 		gem1.xPos = gem2.xPos;
 		gem1.yPos = gem2.yPos;
-		gem2.xPos = tempGem.xPos;
-		gem2.yPos = tempGem.yPos;
+		gem2.xPos = tempGemXPos;
+		gem2.yPos = tempGemYPos;
 	};
 
 	this.swapComplete = function(){
