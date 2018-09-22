@@ -103,24 +103,46 @@ exports = Class(ui.View, function (supr) {
 	};
 
 	this.selectGem = function(gem){
-		console.log("selected gem");
-		//this.inputState = "gemSelected";
+		//console.log("selected gem");
+		this.inputState = "gemSelected";
 		//move the selected gem to the top of others
 		this.removeSubview(gem);
 		this.addSubview(gem);
+		this.selectedGem = gem;
+		gem.selectGem();
 		//deactive all gems except one adjacent to selection
 		for(var i = 0; i < this.gemsList.length; i ++)
 		{
 			var targetGem = this.gemsList[i];
-			if((Math.abs(gem.xPos - targetGem.xPos) == 1 && gem.yPos == targetGem.yPos)
-				|| (gem.xPos == targetGem.xPos && Math.abs(gem.yPos - targetGem.yPos) == 1))
-			{
-				targetGem.activeInput = true;
-			}
-			else
-			{
-				targetGem.activeInput = false;
-			}
+			targetGem.activeInput = ((Math.abs(gem.xPos - targetGem.xPos) == 1 && gem.yPos == targetGem.yPos)
+				|| (gem.xPos == targetGem.xPos && Math.abs(gem.yPos - targetGem.yPos) == 1));
+		}
+	};
+
+	this.swapGems = function(gem1, gem2){
+		this.inputState = "noSelection";
+		this.activateAllGems(false);
+		gem1.resetGem();
+		gem2.resetGem();
+		//swap the gems place in both the model and visually
+		this.gemsGrid[gem1.yPos][gem1.xPos] = gem2;
+		this.gemsGrid[gem2.yPos][gem2.xPos] = gem1;
+		gem1.animateToGemPosition(gem2);
+		gem2.animateToGemPosition(gem1);
+		var tempGem = gem1;
+		gem1.xPos = gem2.xPos;
+		gem1.yPos = gem2.yPos;
+		gem2.xPos = tempGem.xPos;
+		gem2.yPos = tempGem.yPos;
+	};
+
+	this.swapComplete = function(){
+		this.activateAllGems(true);
+	};
+
+	this.activateAllGems = function(toggleOn){
+		for(var i = 0; i < this.gemsList.length; i ++){
+			this.gemsList[i].activeInput = toggleOn;
 		}
 	}
 });

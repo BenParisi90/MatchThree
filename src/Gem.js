@@ -35,6 +35,10 @@ exports = Class(ui.View, function (supr) {
 		this.build();
 	};
 
+	this.resetGem = function(){
+		this._animator.clear();
+		this.gemView.style.scale = 1;
+	}
 	/* Set mole as inactive and animate it down.
 	 */
 	this.selectGem = function () {
@@ -42,6 +46,16 @@ exports = Class(ui.View, function (supr) {
 			.now({scale: 1.15, x: -5, y:-5}, 400)
 			.then({scale: 1, x: 0, y:0}, 400)
 			.then(this.selectGem.bind(this));
+	};
+
+	this.animateToGemPosition = function(targetGem) {
+		xDiff = targetGem.style.x - this.style.x;
+		yDiff = targetGem.style.y - this.style.y;
+		this._animator.clear()
+			.now({x: xDiff, y: yDiff}, 500)
+			.then(bind(this, function () {
+				this.gemHolder.swapComplete();
+			}));
 	};
 
 	/*
@@ -78,9 +92,13 @@ exports = Class(ui.View, function (supr) {
 
 		this._inputview.on('InputSelect', bind(this, function () {
 			if (this.activeInput) {
-				if(this.gemHolder.inputState == "noSelection"){
-					this.gemHolder.selectGem(this);
-					this.selectGem();
+				switch(this.gemHolder.inputState){
+					case "noSelection":
+						this.gemHolder.selectGem(this);
+						break;
+					case "gemSelected":
+						this.gemHolder.swapGems(this, this.gemHolder.selectedGem);
+						break;
 				}
 			}
 		}));
