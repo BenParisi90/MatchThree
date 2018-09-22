@@ -55,9 +55,9 @@ exports = Class(ui.View, function (supr) {
 			.then(this.selectGem.bind(this));
 	};
 
-	this.animateToGemPosition = function(targetGem) {
-		xDiff = targetGem.style.x - this.style.x;
-		yDiff = targetGem.style.y - this.style.y;
+	this.animateToPosition = function(tarX, tarY) {
+		xDiff = tarX - this.style.x;
+		yDiff = tarY - this.style.y;
 		this._animator.clear()
 			.now({x:this.style.x+xDiff, y:this.style.y+yDiff}, 500)
 			.then(bind(this, function () {

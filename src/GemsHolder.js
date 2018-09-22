@@ -126,7 +126,9 @@ exports = Class(ui.View, function (supr) {
 	};
 
 	this.swapGems = function(gem1, gem2){
-		this.inputState = "waitingForSwap";
+		if(this.inputState == "gemSelected"){
+			this.inputState = "waitingForSwap";
+		}
 		this.activateAllGems(false);
 		this.selectedGem = null;
 		gem1.resetGem();
@@ -134,19 +136,39 @@ exports = Class(ui.View, function (supr) {
 		//swap the gems place in both the model and visually
 		this.gemsGrid[gem1.yPos][gem1.xPos] = gem2;
 		this.gemsGrid[gem2.yPos][gem2.xPos] = gem1;
-		gem1.animateToGemPosition(gem2);
-		gem2.animateToGemPosition(gem1);
+		gem1.animateToPosition(gem2.style.x, gem2.style.y);
+		gem2.animateToPosition(gem1.style.x, gem1.style.y);
 		var tempGemXPos = gem1.xPos;
 		var tempGemYPos = gem1.yPos;
 		gem1.xPos = gem2.xPos;
 		gem1.yPos = gem2.yPos;
 		gem2.xPos = tempGemXPos;
 		gem2.yPos = tempGemYPos;
+		this.lastGemsSwapped = [gem1, gem2];
 	};
 
+	this.swapBack = function(){
+		this.inputState = "swappingBack";
+		//this.activateAllGems(true);
+		this.swapGems(this.lastGemsSwapped[0], this.lastGemsSwapped[1]);
+	}
+
 	this.swapComplete = function(){
+		//both gems will call swap complete. make sure it only runs once
 		if(this.inputState == "waitingForSwap"){
-			this.deleteMatches();
+			this.inputState = "firstAnimComplete";
+		}
+		else if(this.inputState == "firstAnimComplete")
+		{
+			if(this.deleteMatches()){
+				this.dropCols(colDropDistances, lowestRowsToDrop);
+			}else{
+				this.swapBack();
+			}
+		}
+		else if(this.inputState == "swappingBack"){
+			this.inputState = "noSelection";
+			this.activateAllGems(true);
 		}
 	};
 
@@ -157,7 +179,8 @@ exports = Class(ui.View, function (supr) {
 	};
 
 	this.deleteMatches = function(){
-		var colsToDrop = [0,0,0,0,0,0,0,0];
+		var colDropDistances = [0,0,0,0,0,0,0,0];
+		var lowestRowsToDrop = [-1,-1,-1,-1,-1,-1,-1,-1];
 		var hasDrops = false;
 		for (var row = 0; row < gemRows; row++) 
 		{
@@ -169,8 +192,9 @@ exports = Class(ui.View, function (supr) {
 					for(var i = col; i > col - 3; i --)
 					{
 						this.removeSubview(this.gemsGrid[row][i]);
-						colsToDrop[i] += 1;
+						colDropDistances[i] += 1;
 						hasDrops = true;
+						lowestRowsToDrop[i] = row - 1;
 					}
 				}
 				if(this.gemCausesColMatch(col, row, targetGem.gemType))
@@ -178,23 +202,34 @@ exports = Class(ui.View, function (supr) {
 					for(var i = row; i > row - 3; i --)
 					{
 						this.removeSubview(this.gemsGrid[i][col]);
-						colsToDrop[col] += 1;
+						colDropDistances[col] += 1;
 						hasDrops = true;
 					}
+					lowestRowsToDrop[col] = i;
 				}
 			}
 		}
-		if(hasDrops){
-			this.dropCols(colsToDrop);
-			this.inputState = "droppingCols";
-		}else{
-			this.inputState = "noSelection";
-			this.activateAllGems(true);
-		}
-		
+		return hasDrops;
+			
 	};
 
-	this.dropCols = function(colsToDrop){
-		console.log(colsToDrop);
+	this.dropCols = function(colDropDistances, lowestRowsToDrop){
+		this.inputState = "droppingCols";
+		console.log("colDropDistances = " + colDropDistances);
+		console.log("lowestRowsToDrop = " + lowestRowsToDrop);
+
+		for (var row = 0; row < gemRows; row++) 
+		{
+			for (var col = 0; col < gemCols; col++) 
+			{
+				if(colDropDistances[col] > 0 && row <= lowestRowsToDrop[col])
+				{
+					var targetGem = this.gemsGrid[row][col];
+					var tarX = targetGem.xPos;
+					var tarY = targetGem.yPos + colDropDistances[col];
+					targetGem.animateToPosition()
+				}
+			}
+		}
 	}
 });
