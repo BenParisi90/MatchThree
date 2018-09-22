@@ -39,10 +39,9 @@ exports = Class(ui.View, function (supr) {
 	 */
 	this.selectGem = function () {
 		this._animator.clear()
-			.now({scale: 1.5, x: -20, y:-20}, 1500)
-			.then(bind(this, function () {
-				console.log("anim complete");
-			}));
+			.now({scale: 1.15, x: -5, y:-5}, 400)
+			.then({scale: 1, x: 0, y:0}, 400)
+			.then(this.selectGem.bind(this));
 	};
 
 	/*
