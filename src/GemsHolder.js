@@ -48,7 +48,7 @@ exports = Class(ui.View, function (supr) {
 			for (var col = 0; col < gemCols; col++) {
 
 					var gemType = this.randomGemType();
-					while(this.gemCausesMatch(col, row, gemType))
+					while(this.gemCausesRowMatch(col, row, gemType) || this.gemCausesColMatch(col, row, gemType))
 					{
 						gemType = this.randomGemType();
 					}
@@ -74,24 +74,13 @@ exports = Class(ui.View, function (supr) {
 	};
 
 	/*we count up and to the left of gem to see if they cause a match*/
-	this.gemCausesMatch = function(xPos, yPos, gemType) {
+	this.gemCausesColMatch = function(xPos, yPos, gemType) {
 		//if we are too clase to the wall, we know we dont have a match
-		if(xPos < 2 && yPos < 2){
+		if(yPos < 2){
 			return false;
 		}
-		var xTar = xPos - 1;
 		var yTar = yPos - 1;
 		var numMatches = 0;
-
-		while(xTar >= 0 && this.gemsGrid[yPos][xTar].gemType == gemType){
-			numMatches ++;
-			xTar --;
-			if(numMatches >= 2){
-				return true;
-			}
-		}
-		
-		numMatches = 0;
 		while(yTar >= 0 && this.gemsGrid[yTar][xPos].gemType == gemType){
 			numMatches ++;
 			yTar --;
@@ -101,6 +90,23 @@ exports = Class(ui.View, function (supr) {
 		}
 		return false;
 	};
+
+	this.gemCausesRowMatch = function(xPos, yPos, gemType){
+		//if we are too clase to the wall, we know we dont have a match
+		if(xPos < 2){
+			return false;
+		}
+		var xTar = xPos - 1;
+		var numMatches = 0;
+		while(xTar >= 0 && this.gemsGrid[yPos][xTar].gemType == gemType){
+			numMatches ++;
+			xTar --;
+			if(numMatches >= 2){
+				return true;
+			}
+		}
+		return false;
+	}
 
 	this.selectGem = function(gem){
 		//console.log("selected gem");
@@ -138,11 +144,39 @@ exports = Class(ui.View, function (supr) {
 
 	this.swapComplete = function(){
 		this.activateAllGems(true);
+		this.deleteMatches();
 	};
 
 	this.activateAllGems = function(toggleOn){
 		for(var i = 0; i < this.gemsList.length; i ++){
 			this.gemsList[i].activeInput = toggleOn;
+		}
+	};
+
+	this.deleteMatches = function(){
+
+		for (var row = 0; row < gemRows; row++) 
+		{
+			for (var col = 0; col < gemCols; col++) 
+			{
+				var targetGem = this.gemsGrid[row][col];
+				if(this.gemCausesRowMatch(col, row, targetGem.gemType))
+				{
+					for(var i = col; i > col - 3; i --)
+					{
+						this.removeSubview(this.gemsGrid[row][i]);
+						//this.gemsGrid[row][col] = null;
+					}
+				}
+				if(this.gemCausesColMatch(col, row, targetGem.gemType))
+				{
+					for(var i = row; i > row - 3; i --)
+					{
+						this.removeSubview(this.gemsGrid[i][col]);
+						//this.gemsGrid[row][col] = null;
+					}
+				}
+			}
 		}
 	}
 });
