@@ -260,8 +260,9 @@ exports = Class(ui.View, function (supr) {
 				for (var row = gemRows - 1; row >= 0; row--) 
 				{
 					/*
-					If the gem should be removed move it to the top, and drop it down by the number of false above it +1
-					If the gem is above a gem that should be removed, drop it by the number of false below it
+					If the gem should be removed move it to the top, randomize it,
+					and drop it down by the number of false above it.
+					If the gem is above a gem that should not be removed, drop it by the number of true below it
 					*/
 					if(this.gemsToRemove[row][col] == true)
 					{
@@ -274,7 +275,7 @@ exports = Class(ui.View, function (supr) {
 							}
 							i--;
 						}
-						gemToRedrop.style.y = -175 - gemSize * dropDistance;
+						gemToRedrop.style.y = -this.style.y - gemSize * (dropDistance + 1);
 						gemToRedrop.setGemType(this.randomGemType());
 						gemToRedrop.animateToPosition(gemToRedrop.xLoc, gemSize * (removedGemsAbove));
 						gemToRedrop.yPos = removedGemsAbove;
