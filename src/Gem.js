@@ -62,7 +62,7 @@ exports = Class(ui.View, function (supr) {
 			.now({x:this.style.x+xDiff, y:this.style.y+yDiff}, 500)
 			.then(bind(this, function () {
 				this.recordGemLocation();
-				this.gemHolder.swapComplete();
+				this.gemHolder.gemAnimComplete();
 			}));
 	};
 
