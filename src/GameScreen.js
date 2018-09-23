@@ -13,7 +13,9 @@ import ui.resource.Image as Image;
 import ui.ImageView;
 import src.GemsHolder as GemsHolder;
 
-var headerImage = new Image({url: "resources/images/ui/header.png", sourceW: 249, sourceH: 166});
+var headerImage = new Image({url: "resources/images/ui/header.png", sourceW: 249, sourceH: 166}),
+	score = 0;
+	highScore = 0;
 
 /* The title screen is added to the scene graph when it becomes
  * a child of the main application. When this class is instantiated,
@@ -34,21 +36,8 @@ exports = Class(ui.ImageView, function (supr) {
 
 	this.build = function() {
 
-		var gemsHolder = new GemsHolder();
+		var gemsHolder = new GemsHolder({gameController:this});
 		this.addSubview(gemsHolder);
-
-		//var gemsHolder = new GemsHolder();
-		/* Since the start button is a part the background image,
-		 * we just need to create and position an overlay view that
-		 * will register input events and act as button.
-		 */
-		/*var startbutton = new ui.View({
-			superview: this,
-			x: 58,
-			y: 313,
-			width: 200,
-			height: 100
-		});*/
 
 		this.headerView = new ui.ImageView({
 			superview: this,
@@ -75,6 +64,36 @@ exports = Class(ui.ImageView, function (supr) {
 		});
 		startText.setText("START");
 
+		this._scoreBoard = new ui.TextView({
+			superview: this,
+			x: 20,
+			y: 882,
+			width: 320,
+			height: 50,
+			autoSize: false,
+			size: 38,
+			verticalAlign: 'middle',
+			horizontalAlign: 'left',
+			wrap: false,
+			color: '#FFFFFF'
+		});
+		this._scoreBoard.setText("Gems Broken: ");
+
+		this._highScore = new ui.TextView({
+			superview: this._scoreBoard,
+			x: 0,
+			y: 50,
+			width: 320,
+			height: 50,
+			autoSize: false,
+			size: 38,
+			verticalAlign: 'middle',
+			horizontalAlign: 'left',
+			wrap: false,
+			color: '#FFFFFF'
+		});
+		this._highScore.setText("High Score: " + highScore);
+
 		this._animator = animate(this.headerView);
 
 		/* Listening for a touch or click event, and will dispatch a
@@ -90,4 +109,9 @@ exports = Class(ui.ImageView, function (supr) {
 			this.emit('titlescreen:start');
 		}));
 	};
+
+	this.incrementScore = function(){
+		score++;
+		this._scoreBoard.setText("Gems Broken: " + score);
+	}
 });

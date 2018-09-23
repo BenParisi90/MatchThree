@@ -21,6 +21,7 @@ exports = Class(ui.View, function (supr) {
 
 		supr(this, 'init', [opts]);
 
+		this.gameController = opts.gameController;
 		this.build();
 	};
 
@@ -281,6 +282,7 @@ exports = Class(ui.View, function (supr) {
 						gemToRedrop.yPos = removedGemsAbove;
 						dropDistance++;
 						this.animsToComplete ++;
+						this.gameController.incrementScore();
 					}
 					else if(dropDistance > 0)
 					{
