@@ -262,6 +262,7 @@ exports = Class(ui.View, function (supr) {
 					var dropYTar = row - this.lowestRowsToDrop[col] - 1;
 					gemToRedrop.yPos = dropYTar;
 					gemToRedrop.style.y = -175 - gemSize * (gemRows - row);
+					gemToRedrop.setGemType(this.randomGemType());
 					gemToRedrop.animateToPosition(gemToRedrop.style.x, gemSize * dropYTar);
 					this.animsToComplete ++;
 				}

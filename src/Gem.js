@@ -11,8 +11,9 @@ import src.soundcontroller as soundcontroller;
 		mole_up = 5,
 		mole_down = 35;*/
 var gemPathPrefix = "resources/images/gems/gem_0",
-	gemSize = 68;
-
+	gemSize = 68,
+	numOfGemTypes = 5,
+	gemImages = [];
 
 exports = Class(ui.View, function (supr) {
 
@@ -24,6 +25,10 @@ exports = Class(ui.View, function (supr) {
 
 		supr(this, 'init', [opts]);
 
+		for(var i = 0; i < numOfGemTypes; i ++){
+			var gemName = i + 1;
+			gemImages.push(new Image({url: gemPathPrefix + gemName + ".png", sourceW: gemSize, sourceH: gemSize}));
+		}
 		//this.activeMole = false;
 		this.gemType = opts.gemType;
 		this.gemHolder = opts.gemHolder;
@@ -33,6 +38,11 @@ exports = Class(ui.View, function (supr) {
 
 		this.build();
 	};
+
+	this.setGemType = function(targetType){
+		this.gemType = targetType;
+		this.gemView.setImage(gemImages[this.gemType]);
+	}
 
 	this.recordGemLocation = function(){
 		this.xLoc = this.style.x;
@@ -70,16 +80,14 @@ exports = Class(ui.View, function (supr) {
 	 * Layout
 	 */
 	this.build = function () {
-		var gemName = this.gemType + 1;
-		this.gemImg = new Image({url: gemPathPrefix + gemName + ".png", sourceW: gemSize, sourceH: gemSize});
 
 		this.gemView = new ui.ImageView({
 			superview: this,
-			image: this.gemImg,
+			image: gemImages[this.gemType],
 			x: 0,
 			y: 0,
-			width: this.gemImg.getWidth(),
-			height: this.gemImg.getHeight()
+			width: gemSize,
+			height: gemSize
 		});
 
 		this._inputview = new ui.View({
@@ -87,8 +95,8 @@ exports = Class(ui.View, function (supr) {
 			clip: true,
 			x: 0,
 			y: 0,
-			width: this.gemImg.getWidth(),
-			height: this.gemImg.getHeight()
+			width: gemSize,
+			height: gemSize
 		});
 
 		/* Create an animator object for gem. 
