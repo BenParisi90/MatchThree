@@ -76,6 +76,14 @@ exports = Class(ui.View, function (supr) {
 			}));
 	};
 
+	this.playDestroyAnim = function(){
+		this._animator.clear()
+			.now({scale:1.5}, 1900)
+			.then(bind(this, function () {
+				this.resetGem();
+			}));
+	}
+
 	/*
 	 * Layout
 	 */
