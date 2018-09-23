@@ -6,6 +6,7 @@
  * and the game screen shown.
  */
 import device;
+import animate;
 import ui.View;
 import ui.TextView;
 import ui.resource.Image as Image;
@@ -59,7 +60,7 @@ exports = Class(ui.ImageView, function (supr) {
 			scale: 1.75
 		});
 
-		this.startText = new ui.TextView({
+		var startText = new ui.TextView({
 			superview: this.headerView,
 			x: 0,
 			y: 85,
@@ -72,8 +73,9 @@ exports = Class(ui.ImageView, function (supr) {
 			wrap: false,
 			color: '#FFFFFF'
 		});
-		this.startText.setText("START");
+		startText.setText("START");
 
+		this._animator = animate(this.headerView);
 
 		/* Listening for a touch or click event, and will dispatch a
 		 * custom event to the title screen, which is listened for in
@@ -81,6 +83,10 @@ exports = Class(ui.ImageView, function (supr) {
 		 */
 		this.headerView.on('InputSelect', bind(this, function () {
 			console.log("start the game");
+			this._animator.clear()
+			.now({y:0}, 250)
+			.then({y:-300}, 300);
+			gemsHolder.waitForInput();
 			this.emit('titlescreen:start');
 		}));
 	};

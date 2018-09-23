@@ -66,7 +66,7 @@ exports = Class(ui.View, function (supr) {
 			}
 		}
 		this.updateGemsGrid();
-		this.waitForInput();
+		this.inputState = "waitingForStart";
 	};
 
 	this.updateGemsGrid = function(){
