@@ -18,7 +18,8 @@ exports = Class(GC.Application, function () {
 	 * place, but before the resources have been loaded.
 	 */
 	this.initUI = function () {
-		var gamescreen = new GameScreen();
+		var gameScreen = new GameScreen();
+		var startButton = new GameScreen();
 
 		this.view.style.backgroundColor = '#008a42';
 
@@ -36,7 +37,7 @@ exports = Class(GC.Application, function () {
 			scale: device.width / 576
 		});
 
-		rootView.push(gamescreen);
+		rootView.push(gameScreen);
 
 		//var sound = soundcontroller.getSound();
 
