@@ -161,7 +161,7 @@ exports = Class(ui.View, function (supr) {
 		else if(this.inputState == "firstAnimComplete")
 		{
 			if(this.deleteMatches()){
-				this.dropCols(colDropDistances, lowestRowsToDrop);
+				this.dropCols(this.colDropDistances, this.lowestRowsToDrop);
 			}else{
 				this.swapBack();
 			}
@@ -179,8 +179,8 @@ exports = Class(ui.View, function (supr) {
 	};
 
 	this.deleteMatches = function(){
-		var colDropDistances = [0,0,0,0,0,0,0,0];
-		var lowestRowsToDrop = [-1,-1,-1,-1,-1,-1,-1,-1];
+		this.colDropDistances = [0,0,0,0,0,0,0,0];
+		this.lowestRowsToDrop = [-1,-1,-1,-1,-1,-1,-1,-1];
 		var hasDrops = false;
 		for (var row = 0; row < gemRows; row++) 
 		{
@@ -191,21 +191,21 @@ exports = Class(ui.View, function (supr) {
 				{
 					for(var i = col; i > col - 3; i --)
 					{
-						this.removeSubview(this.gemsGrid[row][i]);
-						colDropDistances[i] += 1;
+						//this.removeSubview(this.gemsGrid[row][i]);
+						this.colDropDistances[i] += 1;
 						hasDrops = true;
-						lowestRowsToDrop[i] = row - 1;
+						this.lowestRowsToDrop[i] = row - 1;
 					}
 				}
 				if(this.gemCausesColMatch(col, row, targetGem.gemType))
 				{
 					for(var i = row; i > row - 3; i --)
 					{
-						this.removeSubview(this.gemsGrid[i][col]);
-						colDropDistances[col] += 1;
+						//this.removeSubview(this.gemsGrid[i][col]);
+						this.colDropDistances[col] += 1;
 						hasDrops = true;
 					}
-					lowestRowsToDrop[col] = i;
+					this.lowestRowsToDrop[col] = i;
 				}
 			}
 		}
@@ -224,10 +224,10 @@ exports = Class(ui.View, function (supr) {
 			{
 				if(colDropDistances[col] > 0 && row <= lowestRowsToDrop[col])
 				{
-					var targetGem = this.gemsGrid[row][col];
-					var tarX = targetGem.xPos;
-					var tarY = targetGem.yPos + colDropDistances[col];
-					targetGem.animateToPosition()
+					var gemToDrop = this.gemsGrid[row][col];
+					var gemX = gemToDrop.xPos;
+					var gemY = gemToDrop.yPos + colDropDistances[col];
+					gemToDrop.animateToPosition(this.gemsGrid[gemY][gemX].xLoc, this.gemsGrid[gemY][gemX].yLoc)
 				}
 			}
 		}
