@@ -24,12 +24,12 @@ exports = Class(ui.View, function (supr) {
 
 		supr(this, 'init', [opts]);
 
+		//store all the possible gem images
 		for(var i = 0; i < numOfGemTypes; i ++){
 			var gemName = i + 1;
 			gemImages.push(new Image({url: gemPathPrefix + gemName + ".png", sourceW: gemSize, sourceH: gemSize}));
 			gleamImages.push(new Image({url: gleamPathPrefix + gemName + ".png", sourceW: gleamSize, sourceH: gleamSize}));
 		}
-		//this.activeMole = false;
 		this.gemType = opts.gemType;
 		this.gemHolder = opts.gemHolder;
 		this.xPos = opts.xPos;
@@ -39,17 +39,20 @@ exports = Class(ui.View, function (supr) {
 		this.build();
 	};
 
+	//make the gem display a target type
 	this.setGemType = function(targetType){
 		this.gemType = targetType;
 		this.gemView.setImage(gemImages[this.gemType]);
 		this.gleamView.setImage(gleamImages[this.gemType]);
 	}
 
+	//record the gems location on the board to return
 	this.recordGemLocation = function(){
 		this.xLoc = this.style.x;
 		this.yLoc = this.style.y;
 	}
 
+	//stop any animations, and return the gem to its original position and size
 	this.resetGem = function(){
 		this._animator.clear();
 		this.style.x = this.xLoc;
@@ -57,8 +60,8 @@ exports = Class(ui.View, function (supr) {
 		this.style.scale = 1;
 		this.gemView.style.scale = 1;
 	}
-	/* Set mole as inactive and animate it down.
-	 */
+	
+	//loop the selected gem animation
 	this.selectGem = function () {
 		this._animator.clear()
 			.now({scale: 1.15, x: this.style.x-5, y: this.style.y-5}, 400)
@@ -66,6 +69,7 @@ exports = Class(ui.View, function (supr) {
 			.then(this.selectGem.bind(this));
 	};
 
+	//move the gem to a new position, used for swapping and falling in
 	this.animateToPosition = function(tarX, tarY) {
 		xDiff = tarX - this.style.x;
 		yDiff = tarY - this.style.y;
@@ -77,6 +81,7 @@ exports = Class(ui.View, function (supr) {
 			}));
 	};
 
+	//play the sparkle animation of a gem being destroyed
 	this.playDestroyAnim = function(){
 		this._animator.clear()
 			.now(bind(this, function () {
@@ -126,10 +131,10 @@ exports = Class(ui.View, function (supr) {
 		/* Create an animator object for gem. 
 		*/
 		this._animator = animate(this);
-		//this._interval = null;
 
-		//var sound = soundcontroller.getSound();
-
+		//when you click the gem, if there is a gem selected, swap them, 
+		//if there is no gem select it,
+		//if you picked the selected gem, deselect it 
 		this._inputview.on('InputSelect', bind(this, function () {
 			if (this.activeInput) {
 				switch(this.gemHolder.inputState){
@@ -137,7 +142,14 @@ exports = Class(ui.View, function (supr) {
 						this.gemHolder.selectGem(this);
 						break;
 					case "gemSelected":
-						this.gemHolder.swapGems(this, this.gemHolder.selectedGem);
+						if(this === this.gemHolder.selectedGem)
+						{
+							this.gemHolder.unselectGem();
+						}
+						else
+						{
+							this.gemHolder.swapGems(this, this.gemHolder.selectedGem);
+						}
 						break;
 				}
 			}

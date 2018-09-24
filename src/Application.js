@@ -18,10 +18,10 @@ exports = Class(GC.Application, function () {
 	 * place, but before the resources have been loaded.
 	 */
 	this.initUI = function () {
+		//game screen contains logic for the game loop
 		var gameScreen = new GameScreen();
-		var startButton = new GameScreen();
 
-		this.view.style.backgroundColor = '#008a42';
+		this.view.style.backgroundColor = '#000000';
 
 
 		/*Our UI background image is 576 x 1024 we will design to this aspect ratio*/
@@ -37,27 +37,9 @@ exports = Class(GC.Application, function () {
 
 		rootView.push(gameScreen);
 
+		//play the bacground music
 		var sound = soundcontroller.getSound();
 		sound.play('music');
-
-		/* Listen for an event dispatched by the title screen when
-		 * the start button has been pressed. Hide the title screen,
-		 * show the game screen, then dispatch a custom event to the
-		 * game screen to start the game.
-		 */
-		/*titlescreen.on('titlescreen:start', function () {
-			sound.play('levelmusic');
-			rootView.push(gamescreen);
-			gamescreen.emit('app:start');
-		});*/
-
-		/* When the game screen has signalled that the game is over,
-		 * show the title screen so that the user may play the game again.
-		 */
-		/*gamescreen.on('gamescreen:end', function () {
-			sound.stop('levelmusic');
-			rootView.pop();
-		});*/
 	};
 
 	/* Executed after the asset resources have been loaded.

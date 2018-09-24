@@ -1,10 +1,8 @@
-//import src.Gem as Gem;
 import ui.View;
 
 import src.Gem as Gem;
 import src.soundcontroller as soundcontroller;
 
-/*Two dimenstional array for holding all our Gems*/
 var gridSize = 544,
 	gemSize = 68,
 	gemRows = 8,
@@ -23,57 +21,46 @@ exports = Class(ui.View, function (supr) {
 
 		supr(this, 'init', [opts]);
 
+		//link back to the game screen
 		this.gameController = opts.gameController;
+
 		this.build();
 	};
 
-	/*
-	 * Layout the scoreboard and molehills.
-	 */
 	this.build = function () {
-
-		var x_offset = 19;
-		var y_offset = 160;
-
-		/*this.style.width = 320;
-		this.style.height = 480;*/
-
 		//list of all gems as 1 dimensional array
 		this.gemsList = [];
+		//list gems as 2 dimensional array where their positions in the array reflect their board positions
 		this.gemsGrid = [];
 		for (var row = 0; row < gemRows; row++) {
 			//add a new row of gems
 			this.gemsGrid.push([]);
 
 			for (var col = 0; col < gemCols; col++) {
-
-					var gemType = this.randomGemType();
-					while(this.gemCausesRowMatch(col, row, gemType) || this.gemCausesColMatch(col, row, gemType))
-					{
-						gemType = this.randomGemType();
-					}
-					var gem = new Gem({gemType: gemType, gemHolder:this, xPos:col, yPos:row});
-					gem.style.x = col * gem.style.width;
-					gem.style.y = row * (gem.style.height);
-					gem.recordGemLocation();
-					this.addSubview(gem);
-					this.gemsGrid[row].push(gem);
-					this.gemsList.push(gem);
-					//update score on hit event
-					/*molehill.on('molehill:hit', bind(this, function () {
-						if (game_on) {
-							score = score + hit_value;
-							this._scoreboard.setText(score.toString());
-						}
-					}));*/
+				//add a new gem of a random type
+				var gemType = this.randomGemType();
+				//if the gem would cause the board to start with a match, switch to another type
+				while(this.gemCausesRowMatch(col, row, gemType) || this.gemCausesColMatch(col, row, gemType))
+				{
+					gemType = this.randomGemType();
+				}
+				var gem = new Gem({gemType: gemType, gemHolder:this, xPos:col, yPos:row});
+				gem.style.x = col * gem.style.width;
+				gem.style.y = row * (gem.style.height);
+				gem.recordGemLocation();
+				this.addSubview(gem);
+				this.gemsGrid[row].push(gem);
+				this.gemsList.push(gem);
 			}
 		}
+		//record the locations of all the gems
 		this.updateGemsGrid();
+		//wait for the player to click the start button
 		this.inputState = "waitingForStart";
 	};
 
+	//loop through the list of all gems, and position them in the gemsGrid
 	this.updateGemsGrid = function(){
-		//grid of gems as 2 dimensional array
 		this.gemsGrid = [[],[],[],[],[],[],[],[]];
 
 		for(var i = 0; i < this.gemsList.length; i ++){
@@ -82,6 +69,7 @@ exports = Class(ui.View, function (supr) {
 		}
 	}
 
+	//wait for the player to click a gem, or end the game if the time is up
 	this.waitForInput = function(){
 		if(this.gameController.gameActive){
 			this.inputState = "noSelection";
@@ -93,16 +81,13 @@ exports = Class(ui.View, function (supr) {
 		}
 	}
 
+	//generate a random gen type
 	this.randomGemType = function(){
 		return Math.floor(Math.random() * numOfGemTypes);
 	};
 
-	/*we count up and to the left of gem to see if they cause a match*/
+	//does this gem cause a match 3 horizontally?
 	this.gemCausesColMatch = function(xPos, yPos, gemType) {
-		//if we are too clase to the wall, we know we dont have a match
-		if(yPos < 2){
-			return false;
-		}
 		var yTar = yPos - 1;
 		var numMatches = 0;
 		while(yTar >= 0 && this.gemsGrid[yTar][xPos].gemType == gemType){
@@ -115,11 +100,8 @@ exports = Class(ui.View, function (supr) {
 		return false;
 	};
 
+	//does this gem cause a match 3 horizontally?
 	this.gemCausesRowMatch = function(xPos, yPos, gemType){
-		//if we are too clase to the wall, we know we dont have a match
-		if(xPos < 2){
-			return false;
-		}
 		var xTar = xPos - 1;
 		var numMatches = 0;
 		while(xTar >= 0 && this.gemsGrid[yPos][xTar].gemType == gemType){
@@ -132,6 +114,7 @@ exports = Class(ui.View, function (supr) {
 		return false;
 	}
 
+	//when the user clicks on a gem with none selected
 	this.selectGem = function(gem){
 		this.inputState = "gemSelected";
 		//move the selected gem to the top of others
@@ -143,17 +126,19 @@ exports = Class(ui.View, function (supr) {
 		for(var i = 0; i < this.gemsList.length; i ++)
 		{
 			var targetGem = this.gemsList[i];
-			targetGem.activeInput = ((Math.abs(gem.xPos - targetGem.xPos) == 1 && gem.yPos == targetGem.yPos)
-				|| (gem.xPos == targetGem.xPos && Math.abs(gem.yPos - targetGem.yPos) == 1));
+			targetGem.activeInput = ((Math.abs(gem.xPos - targetGem.xPos) <= 1 && gem.yPos == targetGem.yPos)
+				|| (gem.xPos == targetGem.xPos && Math.abs(gem.yPos - targetGem.yPos) <= 1));
 		}
 	};
 
+	//deselect the currently selected gem
 	this.unselectGem = function(){
 		this.inputState = "noSelection";
 		this.selectedGem.resetGem();
 		this.selectedGem = null;
 	}
 
+	//swap the position of two gems
 	this.swapGems = function(gem1, gem2){
 		if(this.inputState == "gemSelected"){
 			this.inputState = "waitingForSwap";
@@ -176,13 +161,14 @@ exports = Class(ui.View, function (supr) {
 		sound.play('gemSwap');
 	};
 
+	//swap the last two gems swapped back, called when the user swaps in a way that does not cause a match
 	this.swapBack = function(){
 		this.inputState = "swappingBack";
-		//this.activateAllGems(true);
 		this.swapGems(this.lastGemsSwapped[0], this.lastGemsSwapped[1]);
 		sound.play('gemSwapBack');
 	}
 
+	//called whenever a gem is done animating
 	this.gemAnimComplete = function(){
 		//both gems will call swap complete. make sure it only runs once
 		if(this.inputState == "waitingForSwap"){
@@ -211,12 +197,15 @@ exports = Class(ui.View, function (supr) {
 		}
 	};
 
+	//turn input for all the gems on or off
 	this.activateAllGems = function(toggleOn){
 		for(var i = 0; i < this.gemsList.length; i ++){
 			this.gemsList[i].activeInput = toggleOn;
 		}
 	};
 
+	//in the current board configuartion, are there matches which should be deleted?
+	//create a 2 dimentioal array of boolean where false should stay and true should be deleted
 	this.shouldDeleteMatches = function(){
 		this.gemsToRemove = [];
 		var hasDrops = false;
@@ -248,6 +237,7 @@ exports = Class(ui.View, function (supr) {
 		return hasDrops;
 	};
 
+	//after a brief delay, play the destroy animation of every gem that should be removed
 	this.destroyGems = function(){
 		setTimeout(bind(this, function () {
 			for (var row = 0; row < gemRows; row++) 
@@ -259,11 +249,12 @@ exports = Class(ui.View, function (supr) {
 					}
 				}
 			}
-			sound.play('gemBreak')
-		}), 100);
+			sound.play('gemBreak');
+		}), 75);
 		this.dropCols();
 	}
 
+	//recycle removed gems to top and drop them in as new gems
 	this.dropCols = function(){
 		setTimeout(bind(this, function () {
 			this.inputState = "droppingCols";
@@ -276,7 +267,6 @@ exports = Class(ui.View, function (supr) {
 					/*
 					If the gem should be removed move it to the top, randomize it,
 					and drop it down by the number of false above it.
-					If the gem is above a gem that should not be removed, drop it by the number of true below it
 					*/
 					if(this.gemsToRemove[row][col] == true)
 					{
@@ -299,6 +289,9 @@ exports = Class(ui.View, function (supr) {
 						this.animsToComplete ++;
 						this.gameController.incrementScore();
 					}
+					/*
+					If the gem is above a gem that should not be removed, drop it by the number of true below it
+					*/
 					else if(dropDistance > 0)
 					{
 						var gemToDrop = this.gemsGrid[row][col];
