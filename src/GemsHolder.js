@@ -2,13 +2,15 @@
 import ui.View;
 
 import src.Gem as Gem;
+import src.soundcontroller as soundcontroller;
 
 /*Two dimenstional array for holding all our Gems*/
 var gridSize = 544,
 	gemSize = 68,
 	gemRows = 8,
 	gemCols = 8,
-	numOfGemTypes = 5;
+	numOfGemTypes = 5,
+	sound = soundcontroller.getSound();
 
 exports = Class(ui.View, function (supr) {
 	this.init = function (opts) {
@@ -171,12 +173,14 @@ exports = Class(ui.View, function (supr) {
 		gem2.yPos = tempGemYPos;
 		this.updateGemsGrid();
 		this.lastGemsSwapped = [gem1, gem2];
+		sound.play('gemSwap');
 	};
 
 	this.swapBack = function(){
 		this.inputState = "swappingBack";
 		//this.activateAllGems(true);
 		this.swapGems(this.lastGemsSwapped[0], this.lastGemsSwapped[1]);
+		sound.play('gemSwapBack');
 	}
 
 	this.gemAnimComplete = function(){
@@ -255,7 +259,7 @@ exports = Class(ui.View, function (supr) {
 					}
 				}
 			}
-			
+			sound.play('gemBreak')
 		}), 100);
 		this.dropCols();
 	}

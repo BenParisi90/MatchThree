@@ -9,16 +9,24 @@ exports.getSound = function () {
     exports.sound = new AudioManager({
       path: 'resources/sounds',
       files: {
-        levelmusic: {
+        music: {
           path: 'music',
           volume: 0.5,
           background: true,
           loop: true
         },
-        whack: {
+        gemBreak: {
           path: 'effect',
           background: false
-        }
+        },
+        gemSwap: {
+          path: 'effect',
+          background: false
+        },
+        gemSwapBack: {
+          path: 'effect',
+          background: false
+        },
       }
     });
   }

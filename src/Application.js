@@ -27,8 +27,6 @@ exports = Class(GC.Application, function () {
 		/*Our UI background image is 576 x 1024 we will design to this aspect ratio*/
 		var rootView = new StackView({
 			superview: this,
-			// x: device.width / 2 - 160,
-			// y: device.height / 2 - 240,
 			x: 0,
 			y: 0,
 			width: 576,
@@ -39,7 +37,8 @@ exports = Class(GC.Application, function () {
 
 		rootView.push(gameScreen);
 
-		//var sound = soundcontroller.getSound();
+		var sound = soundcontroller.getSound();
+		sound.play('music');
 
 		/* Listen for an event dispatched by the title screen when
 		 * the start button has been pressed. Hide the title screen,
