@@ -17,7 +17,8 @@ var headerImage = new Image({url: "resources/images/ui/header.png", sourceW: 249
 	score = 0;
 	highScore = 0,
 	gameLength = 5000,
-	countdownSecs = gameLength / 1000;
+	countdownSecs = gameLength / 1000,
+	canStartNewGame = true;
 
 /* The title screen is added to the scene graph when it becomes
  * a child of the main application. When this class is instantiated,
@@ -105,19 +106,25 @@ exports = Class(ui.ImageView, function (supr) {
 		 * the top-level application file.
 		 */
 		this.headerView.on('InputSelect', bind(this, function () {
-			console.log("start the game");
+			if(canStartNewGame){
+				console.log("start the game");
+				canStartNewGame = false;
 
-			this._animator.clear()
-			.now({y:0}, 250)
-			.then({y:-300}, 300)
-			.then(bind(this, function () {
-				this.startText.setText(countdownSecs);
-			}))
-			.then({y:-0}, 300)
-			.then({y:-20}, 250)
-			.then(bind(this, function () {
-				this.playGame();
-			}));			
+				score = 0;
+				this._scoreBoard.setText("Gems Broken: " + score);
+
+				this._animator.clear()
+				.now({y:0}, 250)
+				.then({y:-300}, 300)
+				.then(bind(this, function () {
+					this.startText.setText(countdownSecs);
+				}))
+				.then({y:-0}, 300)
+				.then({y:-20}, 250)
+				.then(bind(this, function () {
+					this.playGame();
+				}));
+			}
 		}));
 	};
 
@@ -134,6 +141,7 @@ exports = Class(ui.ImageView, function (supr) {
 	this.playGame = function(){
 		this.gameActive = true;
 		this.gemsHolder.waitForInput();
+
 
 		var i = setInterval(this.updateCountdown.bind(this), 1000);
 
@@ -158,6 +166,7 @@ exports = Class(ui.ImageView, function (supr) {
 		countdownSecs = gameLength / 1000;
 
 		setTimeout(bind(this, function () {
+			canStartNewGame = true;
 			this.startText.setText("REPLAY");
 		}), 2000);
 	};
