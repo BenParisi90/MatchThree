@@ -4,16 +4,15 @@ import ui.ImageView;
 import ui.resource.Image as Image;
 import src.soundcontroller as soundcontroller;
 
-/*var mole_normal_img = new Image({url: "resources/images/mole_normal.png", sourceW: 46, sourceH: 54}),
-		mole_hit_img = new Image({url: "resources/images/mole_hit.png", sourceW: 46, sourceH: 54}),
-		hole_back_img = new Image({url: "resources/images/hole_back.png", sourceW: 103, sourceH: 28}),
-		hole_front_img = new Image({url: "resources/images/hole_front.png", sourceW: 103, sourceH: 28}),
-		mole_up = 5,
-		mole_down = 35;*/
+
 var gemPathPrefix = "resources/images/gems/gem_0",
+	gleamPathPrefix = "resources/images/particles/gleam_",
 	gemSize = 68,
+	gleamSize = 57,
 	numOfGemTypes = 5,
-	gemImages = [];
+	gemImages = [],
+	gleamImages = [];
+
 
 exports = Class(ui.View, function (supr) {
 
@@ -28,6 +27,7 @@ exports = Class(ui.View, function (supr) {
 		for(var i = 0; i < numOfGemTypes; i ++){
 			var gemName = i + 1;
 			gemImages.push(new Image({url: gemPathPrefix + gemName + ".png", sourceW: gemSize, sourceH: gemSize}));
+			gleamImages.push(new Image({url: gleamPathPrefix + gemName + ".png", sourceW: gleamSize, sourceH: gleamSize}));
 		}
 		//this.activeMole = false;
 		this.gemType = opts.gemType;
@@ -42,6 +42,7 @@ exports = Class(ui.View, function (supr) {
 	this.setGemType = function(targetType){
 		this.gemType = targetType;
 		this.gemView.setImage(gemImages[this.gemType]);
+		this.gleamView.setImage(gleamImages[this.gemType]);
 	}
 
 	this.recordGemLocation = function(){
@@ -78,7 +79,12 @@ exports = Class(ui.View, function (supr) {
 
 	this.playDestroyAnim = function(){
 		this._animator.clear()
-			.now({scale:1.5}, 1900)
+			.now(bind(this, function () {
+				this.gemView.hide();
+				this.gleamView.show();
+			}))
+			.then({scale: 1.15, x: this.style.x-5, y: this.style.y-5}, 150)
+			.then({scale: 1, x: this.style.x, y:this.style.y}, 150)
 			.then(bind(this, function () {
 				this.resetGem();
 			}));
@@ -97,6 +103,16 @@ exports = Class(ui.View, function (supr) {
 			width: gemSize,
 			height: gemSize
 		});
+
+		this.gleamView = new ui.ImageView({
+			superview: this,
+			image: gleamImages[this.gemType],
+			x: (gemSize - gleamSize) / 2,
+			y: (gemSize - gleamSize) / 2,
+			width:gleamSize,
+			height:gleamSize
+		});
+		this.gleamView.hide();
 
 		this._inputview = new ui.View({
 			superview: this,

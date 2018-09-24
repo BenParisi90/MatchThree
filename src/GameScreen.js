@@ -16,7 +16,7 @@ import src.GemsHolder as GemsHolder;
 var headerImage = new Image({url: "resources/images/ui/header.png", sourceW: 249, sourceH: 166}),
 	score = 0;
 	highScore = 0,
-	gameLength = 5000,
+	gameLength = 30000,
 	countdownSecs = gameLength / 1000,
 	canStartNewGame = true;
 

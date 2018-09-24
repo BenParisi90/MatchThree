@@ -187,7 +187,7 @@ exports = Class(ui.View, function (supr) {
 		else if(this.inputState == "firstAnimComplete")
 		{
 			if(this.shouldDeleteMatches()){
-				this.dropCols();
+				this.destroyGems();
 			}else{
 				this.swapBack();
 			}
@@ -196,14 +196,12 @@ exports = Class(ui.View, function (supr) {
 			this.waitForInput();
 		}
 		else if(this.inputState == "droppingCols"){
-			if(this.animsToComplete > 0){
-				this.animsToComplete --;
-				if(this.animsToComplete == 0){
-					if(this.shouldDeleteMatches()){
-						this.dropCols();
-					}else{
-						this.waitForInput();
-					}
+			this.animsToComplete --;
+			if(this.animsToComplete == 0){
+				if(this.shouldDeleteMatches()){
+					this.destroyGems();
+				}else{
+					this.waitForInput();
 				}
 			}
 		}
@@ -216,8 +214,6 @@ exports = Class(ui.View, function (supr) {
 	};
 
 	this.shouldDeleteMatches = function(){
-		this.colDropDistances = [0,0,0,0,0,0,0,0];
-		this.lowestRowsToDrop = [9,9,9,9,9,9,9,9];
 		this.gemsToRemove = [];
 		var hasDrops = false;
 		for (var row = 0; row < gemRows; row++) 
@@ -233,7 +229,6 @@ exports = Class(ui.View, function (supr) {
 					{
 						hasDrops = true;
 						this.gemsToRemove[row][i] = true;
-						this.lowestRowsToDrop[i] = row - 1;
 					}
 				}
 				if(this.gemCausesColMatch(col, row, targetGem.gemType))
@@ -243,28 +238,30 @@ exports = Class(ui.View, function (supr) {
 						this.gemsToRemove[i][col] = true;
 						hasDrops = true;
 					}
-					this.lowestRowsToDrop[col] = Math.min(this.lowestRowsToDrop[col], i);
-				}
-			}
-		}
-		for (var row = 0; row < gemRows; row++) 
-		{
-			for (var col = 0; col < gemCols; col++) 
-			{
-				if(this.gemsToRemove[row][col] == true){
-					this.gemsGrid[row][col].playDestroyAnim();
-					this.colDropDistances[col]++;
 				}
 			}
 		}
 		return hasDrops;
-			
 	};
 
+	this.destroyGems = function(){
+		setTimeout(bind(this, function () {
+			for (var row = 0; row < gemRows; row++) 
+			{
+				for (var col = 0; col < gemCols; col++) 
+				{
+					if(this.gemsToRemove[row][col] == true){
+						this.gemsGrid[row][col].playDestroyAnim();
+					}
+				}
+			}
+			
+		}), 100);
+		this.dropCols();
+	}
+
 	this.dropCols = function(){
-		this._interval = setInterval(bind(this, function () {
-			console.log("this.colDropDistances = " + this.colDropDistances);
-			console.log("this.lowestRowsToDrop = " + this.lowestRowsToDrop);
+		setTimeout(bind(this, function () {
 			this.inputState = "droppingCols";
 			this.animsToComplete = 0;
 			for (var col = 0; col < gemCols; col++) 
@@ -289,6 +286,8 @@ exports = Class(ui.View, function (supr) {
 							i--;
 						}
 						gemToRedrop.style.y = -this.style.y - gemSize * (dropDistance + 1);
+						gemToRedrop.gemView.show();
+						gemToRedrop.gleamView.hide();
 						gemToRedrop.setGemType(this.randomGemType());
 						gemToRedrop.animateToPosition(gemToRedrop.xLoc, gemSize * (removedGemsAbove));
 						gemToRedrop.yPos = removedGemsAbove;
@@ -308,6 +307,6 @@ exports = Class(ui.View, function (supr) {
 			clearInterval(this._interval);
 			this.updateGemsGrid();
 
-		}), 2000);
+		}), 400);
 	};
 });
