@@ -15,7 +15,9 @@ import src.GemsHolder as GemsHolder;
 
 var headerImage = new Image({url: "resources/images/ui/header.png", sourceW: 249, sourceH: 166}),
 	score = 0;
-	highScore = 0;
+	highScore = 0,
+	gameLength = 5000,
+	countdownSecs = gameLength / 1000;
 
 /* The title screen is added to the scene graph when it becomes
  * a child of the main application. When this class is instantiated,
@@ -34,10 +36,12 @@ exports = Class(ui.ImageView, function (supr) {
 		this.build();
 	};
 
-	this.build = function() {
+	this.build = function() {	
 
-		var gemsHolder = new GemsHolder({gameController:this});
-		this.addSubview(gemsHolder);
+		this.gameActive = false;
+
+		this.gemsHolder = new GemsHolder({gameController:this});
+		this.addSubview(this.gemsHolder);
 
 		this.headerView = new ui.ImageView({
 			superview: this,
@@ -49,20 +53,20 @@ exports = Class(ui.ImageView, function (supr) {
 			scale: 1.75
 		});
 
-		var startText = new ui.TextView({
+		this.startText = new ui.TextView({
 			superview: this.headerView,
 			x: 0,
 			y: 85,
 			width: this.headerView.style.width,
 			height: 50,
 			autoSize: false,
-			size: 45,
+			size: 35,
 			verticalAlign: 'middle',
 			horizontalAlign: 'center',
 			wrap: false,
 			color: '#FFFFFF'
 		});
-		startText.setText("START");
+		this.startText.setText("START");
 
 		this._scoreBoard = new ui.TextView({
 			superview: this,
@@ -102,16 +106,64 @@ exports = Class(ui.ImageView, function (supr) {
 		 */
 		this.headerView.on('InputSelect', bind(this, function () {
 			console.log("start the game");
+
 			this._animator.clear()
 			.now({y:0}, 250)
-			.then({y:-300}, 300);
-			gemsHolder.waitForInput();
-			this.emit('titlescreen:start');
+			.then({y:-300}, 300)
+			.then(bind(this, function () {
+				this.startText.setText(countdownSecs);
+			}))
+			.then({y:-0}, 300)
+			.then({y:-20}, 250)
+			.then(bind(this, function () {
+				this.playGame();
+			}));			
 		}));
 	};
 
 	this.incrementScore = function(){
 		score++;
 		this._scoreBoard.setText("Gems Broken: " + score);
-	}
+	};
+
+	this.updateHighScore = function(){
+		highScore = Math.max(score, highScore);
+		this._highScore.setText("High Score: " + highScore);
+	};
+
+	this.playGame = function(){
+		this.gameActive = true;
+		this.gemsHolder.waitForInput();
+
+		var i = setInterval(this.updateCountdown.bind(this), 1000);
+
+		setTimeout(bind(this, function () {
+			clearInterval(i);
+			this.startText.setText("0");
+			this.gameActive = false;
+			/* end the game if waiting for input. otherwise, the gemHolder will tell the game to
+			end when it's animations complete.*/
+			if(this.gemsHolder.inputState == "noSelection" || this.gemsHolder.inputState == "gemSelected"){
+				this.endGame();
+				if(this.gemsHolder.inputState == "gemSelected"){
+					this.gemHolder.unselectGem();
+				}
+			}
+		}), gameLength);
+	};
+
+	this.endGame = function(){
+		this.startText.setText("GAME OVER");
+		this.updateHighScore();
+		countdownSecs = gameLength / 1000;
+
+		setTimeout(bind(this, function () {
+			this.startText.setText("REPLAY");
+		}), 2000);
+	};
+
+	this.updateCountdown = function(){
+		countdownSecs -= 1;
+		this.startText.setText(countdownSecs);
+	};
 });

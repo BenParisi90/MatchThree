@@ -81,8 +81,14 @@ exports = Class(ui.View, function (supr) {
 	}
 
 	this.waitForInput = function(){
-		this.inputState = "noSelection";
-		this.activateAllGems(true);
+		if(this.gameController.gameActive){
+			this.inputState = "noSelection";
+			this.activateAllGems(true);
+		}
+		else
+		{
+			this.gameController.endGame();
+		}
 	}
 
 	this.randomGemType = function(){
@@ -139,6 +145,12 @@ exports = Class(ui.View, function (supr) {
 				|| (gem.xPos == targetGem.xPos && Math.abs(gem.yPos - targetGem.yPos) == 1));
 		}
 	};
+
+	this.unselectGem = function(){
+		this.inputState = "noSelection";
+		this.selectedGem.resetGem();
+		this.selectedGem = null;
+	}
 
 	this.swapGems = function(gem1, gem2){
 		if(this.inputState == "gemSelected"){
