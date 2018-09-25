@@ -107,7 +107,7 @@ exports = Class(ui.ImageView, function (supr) {
 			if(canStartNewGame){
 
 				canStartNewGame = false;
-
+				this.gemsHolder.randomizeGemsGrid();
 				score = 0;
 				this._scoreBoard.setText("Gems Broken: " + score);
 

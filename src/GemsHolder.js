@@ -37,14 +37,7 @@ exports = Class(ui.View, function (supr) {
 			this.gemsGrid.push([]);
 
 			for (var col = 0; col < gemCols; col++) {
-				//add a new gem of a random type
-				var gemType = this.randomGemType();
-				//if the gem would cause the board to start with a match, switch to another type
-				while(this.gemCausesRowMatch(col, row, gemType) || this.gemCausesColMatch(col, row, gemType))
-				{
-					gemType = this.randomGemType();
-				}
-				var gem = new Gem({gemType: gemType, gemHolder:this, xPos:col, yPos:row});
+				var gem = new Gem({gemType: 0, gemHolder:this, xPos:col, yPos:row});
 				gem.style.x = col * gem.style.width;
 				gem.style.y = row * (gem.style.height);
 				gem.recordGemLocation();
@@ -53,10 +46,28 @@ exports = Class(ui.View, function (supr) {
 				this.gemsList.push(gem);
 			}
 		}
+		this.randomizeGemsGrid();
 		//record the locations of all the gems
 		this.updateGemsGrid();
 		//wait for the player to click the start button
 		this.inputState = "waitingForStart";
+	};
+
+	//randomizes gem grid with a nice cascading animation
+	this.randomizeGemsGrid = function(){
+		for (var row = 0; row < gemRows; row++) {
+
+			for (var col = 0; col < gemCols; col++) {
+				//add a new gem of a random type
+				var gemType = this.randomGemType();
+				//if the gem would cause the board to start with a match, switch to another type
+				while(this.gemCausesRowMatch(col, row, gemType) || this.gemCausesColMatch(col, row, gemType))
+				{
+					gemType = this.randomGemType();
+				}
+				this.gemsGrid[row][col].setGemType(gemType);
+			}
+		}
 	};
 
 	//loop through the list of all gems, and position them in the gemsGrid
